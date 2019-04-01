@@ -1,7 +1,7 @@
 var POPULATION = 400;
 var WIDTH = 20, HEIGHT = 20;
-var COINFITNESS = 50;
-var TOFITNESS = .5, AWAYFITNESS = -2.5;
+var COINFITNESS = 10;
+var TOFITNESS = 1, AWAYFITNESS = -1.5;
 var canvases = [];
 var snakes = [];
 var stop = false;
@@ -381,7 +381,7 @@ function Snake() {
   if (HEIGHT & 1) this.body[0].y = (HEIGHT - 1) / 2;
   else this.body[0].y = (HEIGHT - 2) / 2 + Math.floor(Math.random() * 2);
   for (var i = 0; i < LEN; i++) this.body.push(this.body[0]);
-  this.brain = new Chromosome([ 6, 16, 12, 12, 8, 8, 8, 3 ]); // distance * 3, type * 3 * 3
+  this.brain = new Chromosome([ 6, 16, 12, 12, 3 ]); // distance * 3, type * 3 * 3
   while (!this.coin || this.body.filter(item => item.x == this.coin.x && item.y == this.coin.y).length > 0) {
     this.coin = { x: Math.floor(Math.random() * WIDTH), y: Math.floor(Math.random() * HEIGHT) };
   }
@@ -455,7 +455,7 @@ function DrawEvolution(i) {
 Snake.prototype.Evolution = function () {
   if (!this.alive) return this.length;
 
-  var distanceToCoin = Math.abs(this.body[0].x - this.coin.x) + Math.abs(this.body[0].y - this.coin.y);
+  var distanceToCoin = Math.pow(this.body[0].x - this.coin.x, 2) + Math.pow(this.body[0].y - this.coin.y, 2);
   var dt = [ [ 0, -1 ], [ 1, 0 ], [ 0, 1 ], [ -1, 0 ] ];//x, y;
 
   var direction = this.looking, snake = this.body[0];
@@ -505,7 +505,7 @@ Snake.prototype.Evolution = function () {
   }
 
   this.body.unshift({ x: this.body[0].x + dt[this.looking][0], y: this.body[0].y + dt[this.looking][1] });
-  var newDistanceToCoin = Math.abs(this.body[0].x - this.coin.x) + Math.abs(this.body[0].y - this.coin.y);
+  var newDistanceToCoin = Math.pow(this.body[0].x - this.coin.x, 2) + Math.pow(this.body[0].y - this.coin.y, 2);
   if (newDistanceToCoin > distanceToCoin) this.fitness += AWAYFITNESS;
   else this.fitness += TOFITNESS;
 
