@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Snake Evolution</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <style>
+      * {
+        font-family: 'Roboto', sans-serif;
+      }
+      .evolutionTd, table {
+        border: 5px solid black;
+      }
+      div, body {
+        margin: 0;
+        padding: 0;
+        border-spacing: 0;
+        border-collapse: collapse;
+      }
+      .evolutionTd {
+        display: inline-block;
+        margin: -2.5px;
+      }
+      canvas {
+        width: 100px;
+        height: 100px;
+      }
+      html, body {
+        height: 100%;
+      }
+      .app {
+        display: flex;
+        height: 100%;
+        width: 100%;
+      }
+      .controlMenu {
+        width: 300px;
+        min-width: 75px;
+        overflow-y: auto;
+        background-color: rgb(230, 230, 230);
+        margin-right: 15px;
+        position: fixed;
+        height: 100%;
+      }
+      .workspace {
+        width: calc(100% - 300px);
+        margin-left: 315px;
+        margin-top: 15px;
+      }
+      button {
+        border: 0;
+        background-color: #54B948;
+        color: white;
+        padding: 10px 20px;
+        margin: 15px;
+        display: block;
+        width: calc(100% - 30px);
+        cursor: pointer;
+      }
+      input {
+        border: 5px solid #929BAA;
+        border-radius: 2px;
+        padding: 8px;
+        margin: 5px 15px;
+        width: calc(100% - 60px);
+      }
+      span {
+        margin: 5px 15px;
+        font-size: 12px;
+      }
+      .smallButton {
+        display: inline-block;
+        width: auto;
+        background-color: rgba(0, 0, 0, .05);
+        color: black;
+        border-radius: 500px;
+        float: right;
+        font-size: 15px;
+      }
+      .menu {
+        width: calc(100% - 80px);
+        padding: 25px;
+        font-size: 20px;
+      }
+      .upper {
+        display: flex;
+      }
+      .stopButton {
+        background-color: #ED2939;
+      }
+      .pauseButton {
+        background-color: #808080;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="controlMenu">
+        <div class="upper">
+          <div class="menu">메뉴</div>
+          <button class="smallButton" onclick="SwapMenu();"><</button>
+        </div>
+        <div class="everythingElse">
+          <button class="startButton" onclick="Start();">진화 시작</button>
+          <button class="stopButton" onclick="Stop();" style="display:none;">진화 종료</button>
+          <button class="pauseButton" onclick="Pause();" style="display:none;">일시중지</button>
+          <div>
+            <span>개체 수</span><br />
+            <input type="text" value="400" id="inputPopulation"></input>
+          </div>
+          <div>
+            <span>픽셀 수</span><br />
+            <input type="text" value="20" id="inputPixel"></input>
+          </div>
+          <div>
+            <span>딜레이</span><br />
+            <input type="text" value="20" id="inputDelay"></input>
+          </div>
+          <div>
+            <span>코인 획득 시 점수</span><br />
+            <input type="text" value="50" id="inputCoinFitness"></input>
+          </div>
+          <div>
+            <span>코인에 가까이 갈 시 점수</span><br />
+            <input type="text" value="0.5" id="inputTowardFitness"></input>
+          </div>
+          <div>
+            <span>코인으로부터 멀리 갈 시 점수</span><br />
+            <input type="text" value="-2.5" id="inputAwayFitness"></input>
+          </div>
+          <div>
+            <span>초기 몸 길이</span><br />
+            <input type="text" value="4" id="inputLength"></input>
+          </div>
+        </div>
+      </div>
+      <div class="workspace">
+        <div class="container">
+          <h1>Snake Evolution</h1>
+          <h2 id="h2">[진화 시작] 버튼을 눌러 주세요</h2>
+          <canvas id="myChart" width="500" height="100"></canvas><br />
+          <div id="evolutionTable"></div>
+          <script src="Chart.min.js"></script>
+          <script type="text/javascript" src="main.js"></script>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
