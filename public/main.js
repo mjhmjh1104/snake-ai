@@ -9,18 +9,6 @@ var DELAY = 20;
 var generation = 0;
 var LEN = 4;
 
-var table = document.getElementById('evolutionTable');
-for (var i = 0; i < POPULATION; i++) {
-  var nTd = document.createElement('div');
-  nTd.classList += 'evolutionTd';
-  var nCanvas = document.createElement('canvas');
-  nCanvas.width = 100;
-  nCanvas.height = 100;
-  nTd.appendChild(nCanvas);
-  canvases.push(new Canvas(nCanvas));
-  table.appendChild(nTd);
-}
-
 var time = 0;
 var prevAverage = 0;
 var interval = null;
@@ -43,8 +31,23 @@ function Start() {
   TOFITNESS = parseInt(document.getElementById('inputTowardFitness').value);
   AWAYFITNESS = parseInt(document.getElementById('inputAwayFitness').value);
   LEN = parseInt(document.getElementById('inputLength').value);
+  DELAY = parseInt(document.getElementById('inputDelay').value);
   if (WIDTH < 2) return;
   if (POPULATION < 10) return;
+
+  var table = document.getElementById('evolutionTable');
+  table.innerHTML = '';
+  canvases = [];
+  for (var i = 0; i < POPULATION; i++) {
+    var nTd = document.createElement('div');
+    nTd.classList += 'evolutionTd';
+    var nCanvas = document.createElement('canvas');
+    nCanvas.width = 100;
+    nCanvas.height = 100;
+    nTd.appendChild(nCanvas);
+    canvases.push(new Canvas(nCanvas));
+    table.appendChild(nTd);
+  }
 
   myChart.data.datasets = [{
     label: '평균',
@@ -116,26 +119,54 @@ function Pause() {
   DELAY = parseInt(document.getElementById('inputDelay').value);
 }
 
-var menuOn = true;
-function SwapMenu() {
-  if (menuOn) {
-    menuOn = false;
-    document.getElementsByClassName('everythingElse')[0].style.display = 'none';
-    document.getElementsByClassName('menu')[0].style.display = 'none';
-    document.getElementsByClassName('controlMenu')[0].style.width = '70px';
-    document.getElementsByClassName('smallButton')[0].innerHTML = '>';
-    document.getElementsByClassName('workspace')[0].style.width = 'calc(100% - 70px)';
-    document.getElementsByClassName('workspace')[0].style.marginLeft = '90px';
+function DrawMenu() {
+  oldWidth = window.innerWidth;
+  if (window.innerWidth > 700) {
+    if (!menuOn) {
+      document.getElementsByClassName('everythingElse')[0].style.display = 'none';
+      document.getElementsByClassName('menu')[0].style.display = 'none';
+      document.getElementsByClassName('controlMenu')[0].style = false;
+      document.getElementsByClassName('controlMenu')[0].style.width = '70px';
+      document.getElementsByClassName('smallButton')[0].innerHTML = '>';
+      document.getElementsByClassName('workspace')[0].style.width = 'calc(100% - 70px)';
+      document.getElementsByClassName('workspace')[0].style.marginLeft = '90px';
+    } else {
+      document.getElementsByClassName('everythingElse')[0].style = false;
+      document.getElementsByClassName('menu')[0].style = false;
+      document.getElementsByClassName('controlMenu')[0].style = false;
+      document.getElementsByClassName('smallButton')[0].innerHTML = '<';
+      document.getElementsByClassName('workspace')[0].style = false;
+    }
   } else {
-    menuOn = true;
-    document.getElementsByClassName('everythingElse')[0].style.display = 'block';
-    document.getElementsByClassName('menu')[0].style.display = 'block';
-    document.getElementsByClassName('controlMenu')[0].style.width = '300px';
-    document.getElementsByClassName('smallButton')[0].innerHTML = '<';
-    document.getElementsByClassName('workspace')[0].style.width = 'calc(100% - 300px)';
-    document.getElementsByClassName('workspace')[0].style.marginLeft = '315px';
+    if (!menuOn) {
+      document.getElementsByClassName('everythingElse')[0].style.display = 'none';
+      document.getElementsByClassName('smallButton')[0].innerHTML = '>';
+      document.getElementsByClassName('controlMenu')[0].style = false;
+      document.getElementsByClassName('menu')[0].style = false;
+      document.getElementsByClassName('workspace')[0].style = false;
+      document.getElementsByClassName('controlMenu')[0].style.paddingBottom = '0';
+    } else {
+      document.getElementsByClassName('everythingElse')[0].style = false;
+      document.getElementsByClassName('menu')[0].style = false;
+      document.getElementsByClassName('controlMenu')[0].style = false;
+      document.getElementsByClassName('smallButton')[0].innerHTML = '<';
+      document.getElementsByClassName('workspace')[0].style = false;
+    }
   }
 }
+
+var menuOn = true;
+var oldWidth = window.innerWidth;
+function SwapMenu() {
+  console.log(window.innerWidth);
+  menuOn ^= 1;
+  console.log(menuOn);
+  DrawMenu();
+}
+
+var widthInterval = setInterval(function () {
+  if (!menuOn && window.innerWidth != oldWidth) DrawMenu();
+}, 200);
 
 function CustomClearInterval() {
   oldDelay = DELAY;
@@ -295,30 +326,32 @@ function Select(snakes) {
 
 function mutate(a, b) {
   var brainSize = a.brain.layer.length;
-  for (var i = 1; i < a.brain.layer.length; i++) brainSize += a.brain.layer[i - 1] * a.brain.layer[i];
+  for (var i = 1; i < a.brain.layer.length; i++) brainSize += a.brain.layer[i - 1] * a.brain.layer[i] + a.brain.layer[i];
   brainSize *= 32;
   var point = Math.floor(Math.random() * brainSize);
   var newSnake = new Snake();
 
   var currentSize = 0;
   for (var i = 0; i < newSnake.brain.layer.length; i++) {
-    if (currentSize > point) newSnake.brain.node[i].bios = a.brain.node[i].bios;
-    else if (currentSize + 32 <= point) newSnake.brain.node[i].bios = b.brain.node[i].bios;
-    else {
-      var nPoint = point - currentSize; // slice from here
-      newSnake.brain.node[i].bios = 0;
-      for (var j = 0; j < 32; j++) {
-        if (j < nPoint) {
-          if (a.brain.node[i].bios & (1 << j))
-            newSnake.brain.node[i].bios |= (1 << j);
-        } else {
-          if (b.brain.node[i].bios & (1 << j))
-            newSnake.brain.node[i].bios |= (1 << j);
+    if (i) for (var j = 0; j < newSnake.brain.layer[i]; j++) {
+      if (currentSize > point) newSnake.brain.node[i].bios[j] = a.brain.node[i].bios[j];
+      else if (currentSize + 32 <= point) newSnake.brain.node[i].bios[j] = b.brain.node[i].bios[j];
+      else {
+        var nPoint = point - currentSize; // slice from here
+        newSnake.brain.node[i].bios[j] = 0;
+        for (var j = 0; j < 32; j++) {
+          if (j < nPoint) {
+            if (a.brain.node[i].bios[j] & (1 << j))
+              newSnake.brain.node[i].bios[j] |= (1 << j);
+          } else {
+            if (b.brain.node[i].bios[j] & (1 << j))
+              newSnake.brain.node[i].bios[j] |= (1 << j);
+          }
         }
       }
+      currentSize += 32;
+      if (Math.floor(Math.random() * 125) == 0) newSnake.brain.node[i].bios[j] ^= (1 << Math.floor(Math.random() * 32));
     }
-    currentSize += 32;
-    if (Math.floor(Math.random() * 125) == 0) newSnake.brain.node[i].bios ^= (1 << Math.floor(Math.random() * 32));
     if (i) {
       for (var j = 0; j < newSnake.brain.layer[i]; j++) {
         for (var k = 0; k < newSnake.brain.layer[i - 1]; k++) {
@@ -381,7 +414,7 @@ function Snake() {
   if (HEIGHT & 1) this.body[0].y = (HEIGHT - 1) / 2;
   else this.body[0].y = (HEIGHT - 2) / 2 + Math.floor(Math.random() * 2);
   for (var i = 0; i < LEN; i++) this.body.push(this.body[0]);
-  this.brain = new Chromosome([ 6, 16, 12, 12, 3 ]); // distance * 3, type * 3 * 3
+  this.brain = new Chromosome([ 6, 24, 16, 3 ]); // distance * 3, type * 3 * 3
   while (!this.coin || this.body.filter(item => item.x == this.coin.x && item.y == this.coin.y).length > 0) {
     this.coin = { x: Math.floor(Math.random() * WIDTH), y: Math.floor(Math.random() * HEIGHT) };
   }
@@ -401,15 +434,14 @@ Snake.prototype.Get = function (layer, index) {
   if (!layer) return this.input[index];
   var sum = 0.;
   for (var i = 0; i < this.brain.layer[layer - 1]; i++) sum += this.Get(layer - 1, i) * (this.brain.node[layer].weight[index][i] - Math.pow(2, 31)) / 100000;
-  return ReLU(sum + (this.brain.node[layer - 1].bios - Math.pow(2, 31)) / 100000);
+  return ReLU(sum + (this.brain.node[layer].bios[index] - Math.pow(2, 31)) / 100000);
 }
 
 function Chromosome(arr) {
   this.layer = arr;
   this.node = [];
   for (var i = 0; i < arr.length; i++) {
-    this.node[i] = { weight: [], bios: null };
-    this.node[i].bios = Math.floor(Math.random() * Math.pow(2, 32));
+    this.node[i] = { weight: [], bios: [] };
     if (i) {
       for (var j = 0; j < arr[i]; j++) {
         var nWeight = [];
@@ -418,6 +450,7 @@ function Chromosome(arr) {
         }
         this.node[i].weight[j] = nWeight;
       }
+      for (var j = 0; j < arr[i]; j++) this.node[i].bios[j] = Math.floor(Math.random() * Math.pow(2, 32));
     }
   }
   this.color = [ Math.floor(Math.random() * 63), Math.floor(Math.random() * 63), Math.floor(Math.random() * 63) ];

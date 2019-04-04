@@ -2,6 +2,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Snake Evolution</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <style>
@@ -28,24 +29,63 @@
       html, body {
         height: 100%;
       }
-      .app {
-        display: flex;
-        height: 100%;
-        width: 100%;
-      }
       .controlMenu {
-        width: 300px;
-        min-width: 75px;
         overflow-y: auto;
         background-color: rgb(230, 230, 230);
         margin-right: 15px;
-        position: fixed;
-        height: 100%;
+        padding-bottom: 15px;
+        width: 100%;
       }
-      .workspace {
-        width: calc(100% - 300px);
-        margin-left: 315px;
-        margin-top: 15px;
+      @media (min-width: 700px) {
+        .controlMenu {
+          width: 300px;
+          min-width: 75px;
+          overflow-y: auto;
+          background-color: rgb(230, 230, 230);
+          margin-right: 15px;
+          position: fixed;
+          height: 100%;
+        }
+        .workspace {
+          width: calc(100% - 300px);
+          margin-left: 315px;
+          margin-top: 15px;
+        }
+        .app {
+          display: flex;
+          height: 100%;
+          width: 100%;
+        }
+        #myChart {
+           margin-left: -7.5px;
+        }
+      }
+      @media (max-width: 699px) {
+        .controlMenu {
+          width: 100%;
+          min-width: 75px;
+          overflow-y: auto;
+          background-color: rgb(230, 230, 230);
+          margin-right: 15px;
+        }
+        .workspace {
+          width: 100%;
+          margin-top: 15px;
+        }
+        .app {
+          display: block;
+          width: 100%;
+        }
+        .chartDiv {
+          width: calc(100% - );
+          margin-left: 7.5px;
+        }
+        .labels {
+          margin-left: 15px;
+        }
+        #myChart {
+          margin-left: -7.5px;
+        }
       }
       button {
         border: 0;
@@ -70,7 +110,8 @@
       }
       .smallButton {
         display: inline-block;
-        width: auto;
+        width: 50px;
+        height: 50px;
         background-color: rgba(0, 0, 0, .05);
         color: black;
         border-radius: 500px;
@@ -90,6 +131,15 @@
       }
       .pauseButton {
         background-color: #808080;
+      }
+      .tableDiv {
+        display: flex;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+      }
+      .tableInDiv {
+        display: inline-block;
       }
     </style>
   </head>
@@ -136,10 +186,14 @@
       </div>
       <div class="workspace">
         <div class="container">
-          <h1>Snake Evolution</h1>
-          <h2 id="h2">[진화 시작] 버튼을 눌러 주세요</h2>
-          <canvas id="myChart" width="500" height="100"></canvas><br />
-          <div id="evolutionTable"></div>
+          <div class="labels">
+            <h1>Snake Evolution</h1>
+            <h2 id="h2">[진화 시작] 버튼을 눌러 주세요</h2>
+          </div>
+          <div class="chartDiv">
+            <canvas id="myChart" width="500" height="200"></canvas>
+          </div>
+          <div class="tableDiv"><div class="tableInDiv"><div id="evolutionTable"></div></div></div>
           <script src="Chart.min.js"></script>
           <script type="text/javascript" src="main.js"></script>
         </div>
